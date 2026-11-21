@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Tone.js for procedural sci-fi audio feedback -->
+    <!-- Tone.js for procedural telemetry audio feedback -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <!-- Google Fonts: JetBrains Mono & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -51,10 +51,10 @@
         }
         /* Apple-inspired light frosted glass surface */
         .cyber-panel {
-            background: rgba(255, 255, 255, 0.78);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(22px) saturate(180%);
             -webkit-backdrop-filter: blur(22px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.88);
             box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.05);
         }
         .cyber-border-glow {
@@ -69,7 +69,7 @@
         /* Tactile Apple pill button */
         .apple-btn {
             border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.92);
             border: 1px solid rgba(15, 23, 42, 0.1);
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
             transition: transform 0.14s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.15s ease, box-shadow 0.15s ease;
@@ -80,9 +80,6 @@
         }
         .apple-btn:active {
             transform: scale(0.96);
-        }
-        .scanlines {
-            display: none;
         }
         @keyframes pulse-fast {
             0%, 100% { opacity: 1; }
@@ -97,9 +94,6 @@
 
     <!-- 3D WebGL Canvas Container -->
     <div id="canvas-container"></div>
-
-    <!-- Subtle Overlay Placeholder -->
-    <div class="fixed inset-0 scanlines z-10"></div>
 
     <!-- Toast Notification Banner (Replaces alert) -->
     <div id="toast-notification" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 hidden">
@@ -116,7 +110,7 @@
                 <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
                 <span id="tooltip-city">FRANKFURT, DE</span>
             </div>
-            <div class="text-slate-500 font-mono text-[10px] mt-0.5" id="tooltip-coords">50.1109° N, 8.6821° E</div>
+            <div class="text-slate-500 font-mono text-[10px] mt-0.5" id="tooltip-coords">50.11° N, 8.68° E</div>
             <div class="mt-1.5 pt-1 border-t border-slate-200/80 flex justify-between gap-4 font-mono text-[10px]">
                 <span class="text-slate-500">THREAT INDEX:</span>
                 <span id="tooltip-threat" class="text-red-600 font-bold">CRITICAL</span>
@@ -126,8 +120,8 @@
 
     <!-- HUD Overlay Layer -->
     <div class="fixed inset-0 z-20 pointer-events-none flex flex-col justify-between p-3 sm:p-4">
-        
-        <!-- Top Section: Header + Breaking Live Financial & Crypto Threat Ticker -->
+
+        <!-- Top Section: Header + Breaking Live 24h Financial & Crypto Threat Ticker -->
         <div class="flex flex-col gap-2">
             <header class="flex flex-wrap items-center justify-between gap-2.5 pointer-events-auto">
                 <!-- Brand & System Status -->
@@ -157,6 +151,11 @@
                     <div>
                         <div class="text-[9px] font-mono text-slate-500 uppercase">Wallets Hit</div>
                         <div class="font-mono font-bold text-sm sm:text-base text-red-600" id="stat-wallets-hit">1,842</div>
+                    </div>
+                    <div class="h-7 w-px bg-slate-200 hidden sm:block"></div>
+                    <div class="hidden sm:block">
+                        <div class="text-[9px] font-mono text-slate-500 uppercase">24h Monitor</div>
+                        <div class="font-mono font-bold text-xs sm:text-sm text-emerald-700" id="stat-24h-window">24H LIVE · 1M SYNC</div>
                     </div>
                     <div class="h-7 w-px bg-slate-200 hidden md:block"></div>
                     <div class="hidden md:block">
@@ -191,16 +190,16 @@
                 </div>
             </header>
 
-            <!-- Breaking Financial & Crypto Breach Live News Ticker (< 2 Mins Ago) -->
+            <!-- Breaking 24h Minute-by-Minute Financial, Securities, Money Transfer & Crypto Ticker -->
             <div class="pointer-events-auto cyber-panel rounded-full px-3.5 py-1.5 border border-red-500/25 flex items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2 shrink-0">
                     <span class="px-2.5 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-700 font-mono text-[10px] font-bold tracking-wider flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span>
-                        LIVE FEED · &lt;2M
+                        24H LIVE · 1M STREAM
                     </span>
                 </div>
                 <div id="live-news-banner" class="flex-1 overflow-hidden font-mono text-xs text-slate-800 truncate cursor-pointer hover:text-orange-700 transition" title="Click to inspect full FIU/FCO forensic dossier">
-                    Synchronizing live ransomware &amp; crypto-heist OSINT feeds...
+                    Synchronizing 24-hour minute-by-minute ransomware, securities &amp; crypto-heist OSINT feeds...
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
                     <span id="news-refresh-timer" class="hidden md:inline font-mono text-[10px] text-slate-500">NEXT 15s</span>
@@ -218,10 +217,10 @@
 
         <!-- Bottom Panels: Vector Filters + Sector Focus (Left) & FIU/FCO Live Feeds (Right) -->
         <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-end gap-3 mt-auto">
-            
+
             <!-- Left Panel: Attack Vector Filters & Quick Sector Focus -->
             <div class="flex flex-col gap-2.5 pointer-events-auto w-full lg:w-80">
-                
+
                 <!-- Vector Filter Matrix (Yellow / Orange / Red Palette) -->
                 <div class="cyber-panel rounded-2xl p-3">
                     <div class="flex items-center justify-between mb-2">
@@ -238,11 +237,11 @@
                             <span class="text-[10px] text-slate-500 font-semibold" id="count-DDOS">0</span>
                         </button>
                         <button data-type="MALWARE" class="filter-btn apple-btn py-1.5 px-2.5 font-mono text-xs text-slate-800 flex items-center justify-between">
-                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Crypto/Ransom</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>Crypto/Ransom</span>
                             <span class="text-[10px] text-slate-500 font-semibold" id="count-MALWARE">0</span>
                         </button>
                         <button data-type="INTRUSION" class="filter-btn apple-btn py-1.5 px-2.5 font-mono text-xs text-slate-800 flex items-center justify-between">
-                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>Exploit</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-700"></span>Exploit</span>
                             <span class="text-[10px] text-slate-500 font-semibold" id="count-INTRUSION">0</span>
                         </button>
                         <button data-type="PHISHING" class="filter-btn apple-btn py-1.5 px-2.5 font-mono text-xs text-slate-800 flex items-center justify-between">
@@ -264,7 +263,7 @@
                 </div>
             </div>
 
-            <!-- Right Panel: Tabbed FIU Financial/Crypto Breaches, 24h DNN+RF Forecast & Packet Stream -->
+            <!-- Right Panel: Tabbed FIU Breaches, Carbon+Hydrogen 24H/60D Predictor & Live Vectors -->
             <div class="cyber-panel rounded-2xl p-3 pointer-events-auto w-full lg:w-[31rem] flex flex-col max-h-64 sm:max-h-80">
                 <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/80">
                     <div class="flex items-center gap-2">
@@ -274,8 +273,8 @@
                         </button>
                         <span class="text-slate-300">|</span>
                         <button id="tab-forecast" class="font-mono text-[11px] font-bold tracking-wider text-slate-600 hover:text-amber-700 pb-0.5 uppercase transition flex items-center gap-1">
-                            <span>60d Gemini 4</span>
-                            <span class="px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-800 text-[9px]">NEON</span>
+                            <span>Carbon+Hydrogen</span>
+                            <span class="px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-800 text-[9px]">24H AI</span>
                         </button>
                         <span class="text-slate-300">|</span>
                         <button id="tab-packets" class="font-mono text-[11px] font-bold tracking-wider text-slate-600 hover:text-orange-700 pb-0.5 uppercase transition">
@@ -288,13 +287,71 @@
                     <!-- Dynamic FIU/FCO financial & crypto breach cards injected here -->
                 </div>
                 <div id="forecast-feed" class="hidden overflow-y-auto space-y-2 pr-1 font-mono text-[11px] flex-1">
-                    <!-- Dynamic Gemini 4 (Neon / Carbon / Hydrogen) 60-day media-pattern predictions injected here -->
+                    <!-- Dynamic Carbon + Hydrogen 60-day media-pattern predictions injected here -->
                 </div>
                 <div id="attack-feed" class="hidden overflow-y-auto space-y-1.5 pr-1 font-mono text-[11px] flex-1">
                     <!-- Dynamic packet log items injected here -->
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Probable Case Predictive Report Popup Modal (Carbon + Hydrogen Decision Parameters) -->
+    <div id="prediction-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-4 bg-slate-900/35 backdrop-blur-md">
+        <div class="cyber-panel cyber-border-glow rounded-3xl max-w-2xl w-full p-4 sm:p-6 border border-white/90 shadow-2xl relative max-h-[90vh] overflow-y-auto font-mono">
+            <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-200/80">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-900 text-[10px] font-bold uppercase">CARBON + HYDROGEN PREDICTIVE BRIEF</span>
+                        <span id="pred-modal-prob" class="px-2.5 py-0.5 rounded-full bg-red-500/15 border border-red-500/35 text-red-700 text-[10px] font-bold">92% PROBABILITY</span>
+                    </div>
+                    <h2 id="pred-modal-title" class="font-bold text-base sm:text-lg text-slate-900 mt-1.5">WHO · WHAT · WHEN FORECAST</h2>
+                </div>
+                <button id="btn-close-pred-modal" class="apple-btn p-2 text-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-3 text-xs">
+                <div class="p-3 rounded-2xl bg-white/85 border border-slate-200/80">
+                    <div class="text-[10px] text-slate-500 uppercase">WHO (Actor &amp; Origin)</div>
+                    <div id="pred-modal-who" class="text-xs font-bold text-slate-900 mt-1">UNC-4890</div>
+                    <div id="pred-modal-origin" class="text-[10px] text-orange-700 mt-0.5">ARN Relay</div>
+                </div>
+                <div class="p-3 rounded-2xl bg-white/85 border border-slate-200/80">
+                    <div class="text-[10px] text-slate-500 uppercase">WHAT (System &amp; Machine)</div>
+                    <div id="pred-modal-what" class="text-xs font-bold text-slate-900 mt-1">ISO-20022 &amp; MPC</div>
+                    <div id="pred-modal-machine" class="text-[10px] text-slate-600 mt-0.5 truncate">fra-hsm-signer-04</div>
+                </div>
+                <div class="p-3 rounded-2xl bg-white/85 border border-slate-200/80">
+                    <div class="text-[10px] text-slate-500 uppercase">WHEN &amp; Exposure</div>
+                    <div id="pred-modal-when" class="text-xs font-bold text-red-700 mt-1">Next 0–8h</div>
+                    <div id="pred-modal-loss" class="text-[10px] text-amber-800 mt-0.5">~$46.5M est. exposure</div>
+                </div>
+            </div>
+
+            <div class="mt-3 p-3 rounded-2xl bg-white/85 border border-amber-500/30 text-xs">
+                <div class="text-[10px] font-bold text-amber-900 uppercase mb-1.5">Deciding Parameters &amp; Carbon + Hydrogen Rationale</div>
+                <p id="pred-modal-rationale" class="text-[11px] text-slate-700 leading-relaxed mb-2"></p>
+                <div id="pred-modal-params" class="space-y-1 text-[11px] text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80"></div>
+            </div>
+
+            <div class="mt-3 p-3 rounded-2xl bg-white/85 border border-slate-200/80 text-xs">
+                <div class="text-[10px] font-bold text-slate-700 uppercase mb-1">Vulnerable System, Outdated Firmware &amp; Financial Bodies</div>
+                <div id="pred-modal-infra" class="text-[11px] text-slate-700 space-y-1"></div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-2.5 pt-3 border-t border-slate-200/80">
+                <button id="btn-pred-lock-globe" class="apple-btn px-3.5 py-2 !bg-amber-500/15 hover:!bg-amber-500/25 !border-amber-500/40 text-amber-950 text-[11px] font-semibold">
+                    LOCK TARGET ON 3D GLOBE
+                </button>
+                <button id="btn-download-pred-report" class="apple-btn px-4 py-2 !bg-slate-900 hover:!bg-slate-800 !border-slate-900 text-white text-[11px] font-bold">
+                    DOWNLOAD PREDICTIVE REPORT (.TXT)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -307,7 +364,7 @@
                         <span class="px-2.5 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-700 font-mono text-[10px] font-bold uppercase">FIU / FCO FORENSIC ATTRIBUTION DOSSIER</span>
                         <span id="modal-time" class="font-mono text-xs text-amber-700 font-semibold">18 SECONDS AGO</span>
                     </div>
-                    <h2 id="modal-institution" class="font-mono font-bold text-base sm:text-xl text-slate-900 mt-1.5">Rhein-Main Clearing &amp; Treasury AG</h2>
+                    <h2 id="modal-institution" class="font-mono font-bold text-base sm:text-xl text-slate-900 mt-1.5">Rhein-Main Clearing &amp; Digital Custody AG</h2>
                 </div>
                 <button id="btn-close-modal" class="apple-btn p-2 text-slate-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,11 +383,11 @@
                 <div class="p-3 rounded-2xl bg-white/80 border border-amber-500/30">
                     <div class="text-[10px] text-amber-700 font-semibold uppercase">Wallets Hit &amp; Victim Custody</div>
                     <div id="modal-wallets-count" class="text-base font-bold text-amber-800 mt-0.5">142 Wallets Hit</div>
-                    <div id="modal-victim-wallet" class="text-[10px] text-orange-700 mt-0.5 truncate">0x89f2...4c91 (Institutional Hot)</div>
+                    <div id="modal-victim-wallet" class="text-[10px] text-orange-700 mt-0.5 truncate">0x89f2...4c91 (Institutional MPC)</div>
                 </div>
                 <div class="p-3 rounded-2xl bg-white/80 border border-orange-500/30">
-                    <div class="text-[10px] text-orange-700 font-semibold uppercase">Ransom Demand &amp; Status</div>
-                    <div id="modal-ransom" class="text-base font-bold text-orange-800 mt-0.5">$18.5M (210 BTC)</div>
+                    <div class="text-[10px] text-orange-700 font-semibold uppercase">Ransom, Securities &amp; Transfer</div>
+                    <div id="modal-ransom" class="text-base font-bold text-orange-800 mt-0.5">$18.5M Ransom</div>
                     <div id="modal-ransom-meta" class="text-[10px] text-slate-500 mt-0.5">Deadline: 47h 15m</div>
                 </div>
             </div>
@@ -340,12 +397,12 @@
                 <div class="p-3 rounded-2xl bg-white/80 border border-slate-200/80">
                     <div class="text-[10px] text-slate-500 uppercase">Victim Institution &amp; Location</div>
                     <div id="modal-location" class="text-sm font-semibold text-slate-900 mt-0.5">Frankfurt, Germany [FRA]</div>
-                    <div id="modal-victim-owner" class="text-[10px] text-slate-500 mt-0.5">Custodian: Rhein-Main Digital Custody</div>
+                    <div id="modal-victim-owner" class="text-[10px] text-slate-500 mt-0.5">Custodian: Rhein-Main Treasury &amp; Vaults</div>
                 </div>
                 <div class="p-3 rounded-2xl bg-white/80 border border-orange-500/25">
                     <div class="text-[10px] text-orange-700 uppercase">Attacker Origin, IP/ASN &amp; Physical Trace</div>
-                    <div id="modal-origin" class="text-sm font-semibold text-orange-800 mt-0.5">Northern Relay / ASN-9124 [ARN]</div>
-                    <div id="modal-attacker-address" class="text-[10px] text-slate-600 mt-0.5">Exit C2: 185.220.101.44 · St. Petersburg / Stockholm Transit</div>
+                    <div id="modal-origin" class="text-sm font-semibold text-orange-800 mt-0.5">Northern Transit Relay / ASN-9124 [ARN]</div>
+                    <div id="modal-attacker-address" class="text-[10px] text-slate-600 mt-0.5">C2 IP: 185.220.101.44</div>
                 </div>
             </div>
 
@@ -358,35 +415,42 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-200/80">
                         <span class="text-slate-500 block text-[9px] uppercase">Threat Actor Emails / PGP</span>
-                        <span id="modal-osint-email" class="text-emerald-700 font-medium break-all">lock_ops4890@onionmail.org · admin@sec-audit-eu.net</span>
+                        <span id="modal-osint-email" class="text-emerald-700 font-medium break-all">ops_4890@onionmail.org</span>
                     </div>
                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-200/80">
                         <span class="text-slate-500 block text-[9px] uppercase">VoIP / Burner Phone Numbers</span>
-                        <span id="modal-osint-phone" class="text-amber-700 font-medium">+372-5894-2109 (Estonia VoIP) · +44-7418-390112</span>
+                        <span id="modal-osint-phone" class="text-amber-700 font-medium">+372-5894-2109</span>
                     </div>
                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-200/80">
                         <span class="text-slate-500 block text-[9px] uppercase">Social Media / Telegram / Darknet</span>
-                        <span id="modal-osint-social" class="text-orange-700 font-medium">TG: @unc4890_negotiator · X: @zero_vault_leak · Tox: 8F9A...21C</span>
+                        <span id="modal-osint-social" class="text-orange-700 font-medium">TG: @unc4890_desk</span>
                     </div>
                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-200/80">
                         <span class="text-slate-500 block text-[9px] uppercase">Attacker Laundering / Extortion Wallets</span>
-                        <span id="modal-attacker-wallet" class="text-red-700 font-medium break-all">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh (BTC)</span>
+                        <span id="modal-attacker-wallet" class="text-red-700 font-medium break-all">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Systems & Root Cause -->
+            <!-- Systems, Firmware & Financial Bodies -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-2.5 font-mono text-xs">
                 <div class="p-3 rounded-2xl bg-white/80 border border-slate-200/80">
-                    <div class="text-[10px] text-slate-500 uppercase">Compromised Systems &amp; Smart Contracts</div>
-                    <div id="modal-systems" class="text-slate-800 mt-1 text-[11px] font-medium">ISO-20022 Switch, MPC Custody Signer, Treasury API</div>
+                    <div class="text-[10px] text-slate-500 uppercase">Vulnerable System &amp; Outdated Firmware</div>
+                    <div id="modal-systems" class="text-slate-800 mt-1 text-[11px] font-medium">ISO-20022 Switch, Fireblocks MPC API</div>
+                    <div id="modal-firmware" class="text-red-700 mt-1 text-[10px] font-semibold">Outdated Firmware: HSM v7.7.0</div>
                 </div>
                 <div class="p-3 rounded-2xl bg-white/80 border border-slate-200/80">
-                    <div class="text-[10px] text-slate-500 uppercase">Root Cause &amp; Kill-Chain Summary</div>
-                    <p id="modal-why" class="text-slate-700 mt-1 text-[11px] leading-relaxed">
-                        Unpatched OAuth token validation flaw in partner liquidity portal enabled unauthorized wire &amp; MPC wallet drain.
-                    </p>
+                    <div class="text-[10px] text-slate-500 uppercase">Financial Bodies &amp; Ransom / Securities Trace</div>
+                    <div id="modal-bodies" class="text-orange-800 mt-1 text-[10px] font-semibold">BaFin · Bundesbank FIU · ESMA</div>
+                    <div id="modal-demand-types" class="text-slate-700 mt-1 text-[10px]">Ransom / Securities / Wire Demands</div>
                 </div>
+            </div>
+
+            <div class="mt-2.5 p-3 rounded-2xl bg-white/80 border border-slate-200/80 font-mono text-xs">
+                <div class="text-[10px] text-slate-500 uppercase">Root Cause &amp; Kill-Chain Summary</div>
+                <p id="modal-why" class="text-slate-700 mt-1 text-[11px] leading-relaxed">
+                    Exploitation of unpatched OAuth token validation bug in partner liquidity portal.
+                </p>
             </div>
 
             <!-- Action Footer: 3D Globe Locking + Apple Pill Report Export -->
@@ -458,8 +522,11 @@
                 walletsHit: 142,
                 victimWallet: '0x89f2A41c90E71B44d2a190F8c112B4c91 (Institutional MPC)',
                 victimOwner: 'Rhein-Main Treasury & Client Omnibus Vaults',
-                ransom: '$18.5M (210 BTC)',
-                ransomMeta: 'Deadline: 47h 15m · Double-Extortion Leak Portal Active',
+                ransom: '$18.5M Ransom + $7.2M Repo/Securities Hold',
+                ransomMeta: 'Deadline: 47h 15m · Crypto + Securities Settlement Extortion',
+                financialBodies: 'BaFin, Deutsche Bundesbank FIU, ESMA, SWIFT / CLS Clearing',
+                demandBreakdown: 'Ransom: $18.5M (210 BTC) · Securities Demand: $7.2M Bund/Eq. Pledge · Money Transfer Hold: $11.3M SEPA/TARGET2',
+                outdatedFirmware: 'Thales Luna HSM Firmware v7.7.0 (Outdated; Upgrade to v7.8.4+) & Cisco IOS-XE 17.9.3a',
                 targetNodeId: 'FRA',
                 targetLocation: 'Frankfurt, Germany',
                 originNodeId: 'ARN',
@@ -482,8 +549,11 @@
                 walletsHit: 318,
                 victimWallet: 'bc1q9vza2e8x572nkys26ra29f2983749283749 (Prime Custody)',
                 victimOwner: 'Meridian APAC Institutional LP Wallets',
-                ransom: '$32.0M (XMR / BTC)',
+                ransom: '$32.0M Ransom + $19.4M Tokenized Treasury/Bond Demand',
                 ransomMeta: 'Deadline: 23h 40m · Tor Negotiation Room #8841',
+                financialBodies: 'MAS (Monetary Authority of Singapore), CAD / SPF FIU, SGX Clearing',
+                demandBreakdown: 'Ransom: $32.0M (XMR/BTC) · Securities Demand: $19.4M Tokenized T-Bills · Money Transfer: $17.1M CHAPS/FAST',
+                outdatedFirmware: 'YubiHSM2 Firmware v2.3.1 (Outdated; Upgrade to v2.4.0+) & Fortinet FortiOS 7.2.6',
                 targetNodeId: 'SIN',
                 targetLocation: 'Singapore, SG',
                 originNodeId: 'ICN',
@@ -506,8 +576,11 @@
                 walletsHit: 894,
                 victimWallet: 'TNPeeaaFB7K9cmo4uQpcU32zGK8G1NYqeL (TRON Hot Bridge)',
                 victimOwner: 'Atlantic Retail Instant-Settlement User Wallets',
-                ransom: '$9.4M (105 BTC)',
+                ransom: '$9.4M Ransom + $5.8M Wire Transfer Extortion',
                 ransomMeta: 'Deadline: 11h 50m · Ransom DDoS + API Key Extortion',
+                financialBodies: 'FinCEN, SEC, Federal Reserve, DTCC / Fedwire Settlement',
+                demandBreakdown: 'Ransom: $9.4M (105 BTC) · Securities Demand: $5.8M Custodial Equities · Money Transfer: $7.8M Fedwire/ACH',
+                outdatedFirmware: 'Palo Alto PAN-OS 10.2.8-h3 (Outdated) & Ledger Vault HSM Firmware v1.0.4',
                 targetNodeId: 'IAD',
                 targetLocation: 'Ashburn, Virginia, USA',
                 originNodeId: 'AMS',
@@ -530,8 +603,11 @@
                 walletsHit: 64,
                 victimWallet: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F (Margin Pool)',
                 victimOwner: 'Thames & Sterling Institutional Clearing Pool',
-                ransom: '$15.0M (170 BTC)',
+                ransom: '$15.0M Ransom + $12.6M Collateral/Securities Demand',
                 ransomMeta: 'Deadline: 35h 10m · 4.2 TB Client KYC & Ledger Stolen',
+                financialBodies: 'UK NCA / UKFIU, FCA, Bank of England, LCH Clearing',
+                demandBreakdown: 'Ransom: $15.0M (170 BTC) · Securities Demand: $12.6M Gilts/Margin Collateral · Money Transfer: $11.6M CHAPS',
+                outdatedFirmware: 'Entrust nShield Connect Firmware v12.70.1 (Outdated) & Juniper Junos 21.4R3',
                 targetNodeId: 'LHR',
                 targetLocation: 'London, United Kingdom',
                 originNodeId: 'SJC',
@@ -554,8 +630,11 @@
                 walletsHit: 275,
                 victimWallet: '3FZbgi29cpjq2GjdwV8eyHuJJnkLtktZc5 (Custody Vault #3)',
                 victimOwner: 'Kanto-Nippon Corporate Escrow Accounts',
-                ransom: '$25.0M (XMR)',
+                ransom: '$25.0M Ransom + $14.0M JGB/Securities Hold',
                 ransomMeta: 'Deadline: 18h 05m · Decryption Key Escrow Active',
+                financialBodies: 'JAFIC (Japan FIU), FSA Japan, Bank of Japan, JSCC',
+                demandBreakdown: 'Ransom: $25.0M (XMR) · Securities Demand: $14.0M Tokenized JGBs · Money Transfer: $15.0M Zengin/SWIFT',
+                outdatedFirmware: 'Utimaco CryptoServer Firmware v4.30.1 (Outdated) & VMware ESXi 7.0 U3o',
                 targetNodeId: 'TYO',
                 targetLocation: 'Tokyo, Japan',
                 originNodeId: 'HKG',
@@ -578,8 +657,11 @@
                 walletsHit: 149,
                 victimWallet: '0x28C6c06298d514Db089934071355E5743bf21d60 (Trade Escrow)',
                 victimOwner: 'Harbourfront Cross-Border Trade Finance Wallets',
-                ransom: '$12.8M (145 BTC)',
+                ransom: '$12.8M Ransom + $8.1M Trade Bill/Securities Demand',
                 ransomMeta: 'Deadline: 59h 30m · SWIFT & Counterparty Records Held',
+                financialBodies: 'HKMA, JFIU Hong Kong, SFC, HKEX Clearing',
+                demandBreakdown: 'Ransom: $12.8M (145 BTC) · Securities Demand: $8.1M Commodity Notes · Money Transfer: $7.0M CHATS/SWIFT',
+                outdatedFirmware: 'IBM 4769 PCIe Crypto Coprocessor FW v2.42 (Outdated) & Fortinet SSL-VPN 7.0.12',
                 targetNodeId: 'HKG',
                 targetLocation: 'Hong Kong, SAR',
                 originNodeId: 'DXB',
@@ -638,14 +720,14 @@
                         return;
                     }
                 }
-            } catch (err) {
+            } catch (_) {
                 // Fallback gracefully to live-synchronized FIU/FCO telemetry stream
             }
             badge.textContent = 'LIVE OSINT STREAM';
         }
 
         // ==========================================
-        // 3. PROCEDURAL AUDIO ENGINE (Tone.js)
+        // 3. PROCEDURAL AUDIO ENGINE (Tone.js) & TOAST
         // ==========================================
         let synth = null;
         function initAudio() {
@@ -663,7 +745,7 @@
             try {
                 const notes = { DDOS: 'C6', MALWARE: 'G5', INTRUSION: 'E5', PHISHING: 'A5' };
                 synth.triggerAttackRelease(notes[type] || 'C5', '32n');
-            } catch (e) { /* Ignore audio context warnings */ }
+            } catch (_) { /* Ignore audio context warnings */ }
         }
 
         function showToast(message) {
@@ -873,6 +955,11 @@
         // ==========================================
         // 5. CYBER ATTACK ARC & RIPPLE SIMULATION
         // ==========================================
+        const feedContainer = document.getElementById('attack-feed');
+        const incidentFeedContainer = document.getElementById('incident-feed');
+        const liveNewsBanner = document.getElementById('live-news-banner');
+        const incidentModal = document.getElementById('incident-modal');
+
         function updateTelemetryUI(atk) {
             document.getElementById('count-ALL').textContent = state.counts.ALL;
             document.getElementById('count-DDOS').textContent = state.counts.DDOS;
@@ -982,11 +1069,6 @@
         // ==========================================
         // 6. FIU & FCO LIVE BREACHES, WALLET LOSS & OSINT TRACKER
         // ==========================================
-        const feedContainer = document.getElementById('attack-feed');
-        const incidentFeedContainer = document.getElementById('incident-feed');
-        const liveNewsBanner = document.getElementById('live-news-banner');
-        const incidentModal = document.getElementById('incident-modal');
-
         function formatRelativeSeconds(timestampMs) {
             const diffSec = Math.max(1, Math.floor((Date.now() - timestampMs) / 1000));
             if (diffSec < 60) return `${diffSec}s ago`;
@@ -1059,7 +1141,7 @@
                         <span class="text-amber-800 font-bold">${inc.walletsHit} WALLETS HIT</span>
                     </div>
                     <div class="flex items-center justify-between gap-2 mt-0.5 text-[10px]">
-                        <span class="text-orange-800 truncate font-medium">Victim Wallet: ${inc.victimWallet.split(' ')[0]}</span>
+                        <span class="text-orange-800 truncate font-medium">Bodies: ${inc.financialBodies.split(',')[0]} · ${inc.victimWallet.split(' ')[0]}</span>
                         <span class="text-red-700 shrink-0 font-semibold">Ransom: ${inc.ransom.split(' ')[0]}</span>
                     </div>
                     <div class="flex items-center justify-between gap-1.5 mt-1.5 pt-1 border-t border-slate-200/80 text-[10px]">
@@ -1117,6 +1199,9 @@
             document.getElementById('modal-osint-social').textContent = inc.osintSocial;
             document.getElementById('modal-attacker-wallet').textContent = inc.attackerWallet;
             document.getElementById('modal-systems').textContent = inc.systems;
+            document.getElementById('modal-firmware').textContent = `Outdated Firmware: ${inc.outdatedFirmware}`;
+            document.getElementById('modal-bodies').textContent = `Financial & Regulatory Bodies: ${inc.financialBodies}`;
+            document.getElementById('modal-demand-types').textContent = inc.demandBreakdown;
             document.getElementById('modal-why').textContent = inc.why;
 
             incidentModal.classList.remove('hidden');
@@ -1147,13 +1232,15 @@
                 `   - Sector:            ${inc.sector}`,
                 `   - Target Hub / Loc:  ${inc.targetLocation} [${inc.targetNodeId}]`,
                 `   - Wallet Custodian:  ${inc.victimOwner}`,
+                `   - Financial Bodies:  ${inc.financialBodies}`,
                 '',
-                '2. FINANCIAL & CRYPTOCURRENCY LOSS BREAKDOWN',
+                '2. FINANCIAL, SECURITIES, MONEY TRANSFER & CRYPTO LOSS BREAKDOWN',
                 `   - Total Fiat/Crypto: ${inc.loss}`,
                 `   - Crypto Drained:    ${inc.cryptoStolen}`,
                 `   - Wallets Hit Count: ${inc.walletsHit} wallets compromised`,
                 `   - Primary Victim ID: ${inc.victimWallet}`,
-                `   - Ransom Demanded:   ${inc.ransom} (${inc.ransomMeta})`,
+                `   - Ransom / Demands:  ${inc.ransom} (${inc.ransomMeta})`,
+                `   - Demand Breakdown:  ${inc.demandBreakdown}`,
                 '',
                 '3. THREAT ACTOR ATTRIBUTION & ORIGIN GEOLOCATION',
                 `   - Threat Syndicate:  ${inc.actor}`,
@@ -1166,10 +1253,11 @@
                 `   - Phone / VoIP:      ${inc.osintPhone}`,
                 `   - Social / Darknet:  ${inc.osintSocial}`,
                 '',
-                '5. TECHNICAL ROOT CAUSE & COMPROMISED INFRASTRUCTURE',
+                '5. TECHNICAL ROOT CAUSE, VULNERABLE SYSTEM & OUTDATED FIRMWARE',
                 `   - Systems Involved:  ${inc.systems}`,
+                `   - Outdated Firmware: ${inc.outdatedFirmware}`,
                 `   - Kill Chain / Why:  ${inc.why}`,
-                ...(typeof buildForecastReportSection === 'function' ? buildForecastReportSection(inc) : []),
+                ...buildForecastReportSection(inc),
                 '================================================================================',
                 'CLASSIFICATION: TLP:AMBER+STRICT // FOR FIU, FCO & LAW ENFORCEMENT ACTION ONLY',
                 '================================================================================'
@@ -1186,7 +1274,7 @@
             try {
                 document.execCommand('copy');
                 showToast(`Copied FIU/FCO Report (${inc.id}) to clipboard`);
-            } catch (e) {
+            } catch (_) {
                 showToast('Unable to copy report');
             }
             document.body.removeChild(textarea);
@@ -1244,71 +1332,37 @@
             downloadFiuReport(state.selectedIncident);
         });
 
-        // Right Panel Tab Switching
-        const tabPackets = document.getElementById('tab-packets');
-        const tabIncidents = document.getElementById('tab-incidents');
-        const tabForecast = document.getElementById('tab-forecast');
-        const forecastFeedContainer = document.getElementById('forecast-feed');
-
-        function setActiveRightTab(activeKey) {
-            tabIncidents.classList.remove('text-red-700', 'border-b-2', 'border-red-600');
-            tabIncidents.classList.add('text-slate-600');
-            tabForecast.classList.remove('text-amber-800', 'border-b-2', 'border-amber-600');
-            tabForecast.classList.add('text-slate-600');
-            tabPackets.classList.remove('text-orange-700', 'border-b-2', 'border-orange-600');
-            tabPackets.classList.add('text-slate-600');
-
-            incidentFeedContainer.classList.add('hidden');
-            forecastFeedContainer.classList.add('hidden');
-            feedContainer.classList.add('hidden');
-
-            if (activeKey === 'incidents') {
-                tabIncidents.classList.add('text-red-700', 'border-b-2', 'border-red-600');
-                tabIncidents.classList.remove('text-slate-600');
-                incidentFeedContainer.classList.remove('hidden');
-            } else if (activeKey === 'forecast') {
-                tabForecast.classList.add('text-amber-800', 'border-b-2', 'border-amber-600');
-                tabForecast.classList.remove('text-slate-600');
-                forecastFeedContainer.classList.remove('hidden');
-                runHybridDnnRandomForestForecast();
-            } else {
-                tabPackets.classList.add('text-orange-700', 'border-b-2', 'border-orange-600');
-                tabPackets.classList.remove('text-slate-600');
-                feedContainer.classList.remove('hidden');
-            }
-        }
-
-        tabIncidents.addEventListener('click', () => setActiveRightTab('incidents'));
-        tabForecast.addEventListener('click', () => setActiveRightTab('forecast'));
-        tabPackets.addEventListener('click', () => setActiveRightTab('packets'));
-
         // ==========================================
-        // 7B. GOOGLE GEMINI 4 (NEON / CARBON / HYDROGEN) 60-DAY MEDIA & THREAT PREDICTOR
+        // 7B. CARBON + HYDROGEN COMBINED PREDICTIVE TOOL (WHO · WHAT · WHEN · PROBABILITY)
         // ==========================================
-        // Uses Google's November 2026 Gemini 4 family (primary: gemini-4-neon, high-depth: gemini-4-carbon,
-        // fast/free-tier fallback: gemini-4-hydrogen) with Google Search grounding + deterministic 60-day
-        // media-pattern synthesis across system, target machine/host, location, and threat actor/origin.
         const GEMINI4_MODELS = {
-            primary: 'gemini-4-neon',
-            deep: 'gemini-4-carbon',
-            fallback: 'gemini-4-hydrogen'
+            carbon: 'gemini-4-carbon',
+            hydrogen: 'gemini-4-hydrogen'
         };
 
         const SIXTY_DAY_MEDIA_PATTERNS = [
             {
                 id: 'PAT-60D-01',
-                mediaSource: '60d Media & CISA/CERT Advisories (Sep–Nov 2026)',
+                mediaSource: '60d Media & CISA/CERT Advisories',
                 nodeId: 'FRA',
                 actor: 'UNC-4890 / LockBit-Next Syndicate',
                 actorOrigin: 'Northern Transit Relay / ASN-9124 [ARN]',
                 system: 'ISO-20022 Clearing & MPC Custody Signer',
                 targetMachine: 'fra-hsm-signer-04.eu-central.custody.internal (Linux 6.x / Nitro Enclave)',
+                outdatedFirmware: 'Thales Luna HSM FW v7.7.0 (Outdated; Upgrade to v7.8.4+)',
+                financialBodies: 'BaFin, Deutsche Bundesbank FIU, ESMA, SWIFT/CLS',
+                demandFocus: 'Crypto Ransom + Bund/Repo Securities Hold + SEPA Wire',
                 vulnerability: 'OAuth Token Validation & Threshold Signature Race (CVE-2026-2914)',
                 vector: 'INTRUSION',
-                patternWeight: 0.91,
+                patternWeight: 0.92,
                 projectedLossM: 46.5,
-                windowHours: 'Next 0–8h',
-                rationale: '60-day reporting shows repeated weekend probing of European liquidity APIs followed by HSM signing-key staging from Nordic/Baltic relays.'
+                windowHours: 'Next 0–8h (Peak ~06:30 UTC)',
+                rationale: '60-day reporting shows repeated probing of European liquidity APIs followed by HSM signing-key staging from Nordic/Baltic relays.',
+                parameters: [
+                    'Carbon Weight (0.62): Multi-hop HSM/OAuth kill-chain match across 60d European clearing reports',
+                    'Hydrogen Weight (0.38): High-velocity Nordic->Frankfurt probe burst & elevated ISO-20022 anomaly rate',
+                    'Firmware Drift Signal: Outdated HSM microcode v7.7.0 exposes signing session queue under load'
+                ]
             },
             {
                 id: 'PAT-60D-02',
@@ -1318,12 +1372,20 @@
                 actorOrigin: 'East Asia / Shenyang-Seoul Fiber Relay [ICN]',
                 system: 'Cross-Chain Liquidity Bridge & Hot Wallet Router',
                 targetMachine: 'sin-bridge-relayer-02.apac.treasury.net (Ubuntu 24.04 / K8s Signer Pod)',
+                outdatedFirmware: 'YubiHSM2 FW v2.3.1 (Outdated; Upgrade to v2.4.0+)',
+                financialBodies: 'MAS Singapore, CAD/SPF FIU, SGX Clearing',
+                demandFocus: 'BTC/XMR Crypto Drain + Tokenized Treasury Settlement',
                 vulnerability: 'Relayer Nonce Drift & CI/CD Artifact Signing Bypass',
                 vector: 'MALWARE',
-                patternWeight: 0.89,
+                patternWeight: 0.90,
                 projectedLossM: 64.0,
-                windowHours: 'Next 2–12h',
-                rationale: '60-day advisories track DPRK/BlueNoroff persona lures targeting APAC exchange engineers ahead of automated bridge liquidity sweeps.'
+                windowHours: 'Next 2–12h (Peak ~09:15 UTC)',
+                rationale: '60-day advisories track persona lures targeting APAC exchange engineers ahead of automated bridge liquidity sweeps.',
+                parameters: [
+                    'Carbon Weight (0.60): CI/CD signing-key & bridge relayer compromise pattern from 60d APAC advisories',
+                    'Hydrogen Weight (0.40): Rapid ICN->SIN malware/exploit trajectory frequency in live 24h radar',
+                    'Firmware Drift Signal: Outdated YubiHSM2 v2.3.1 & unrotated signer pod credentials'
+                ]
             },
             {
                 id: 'PAT-60D-03',
@@ -1333,12 +1395,20 @@
                 actorOrigin: 'Amsterdam Bulletproof Hosting Cluster [AMS]',
                 system: 'Treasury SSO / FIDO2 Helpdesk & ACH Edge Gateway',
                 targetMachine: 'iad-sso-idp-09.us-east.bancorp.local (Windows Server 2025 / Entra Edge)',
+                outdatedFirmware: 'Palo Alto PAN-OS 10.2.8-h3 (Outdated) & Ledger Vault FW v1.0.4',
+                financialBodies: 'FinCEN, SEC, Federal Reserve, DTCC/Fedwire',
+                demandFocus: 'Ransom + Fedwire/ACH Transfer Diversion + Custodial Equities',
                 vulnerability: 'Helpdesk Vishing Token Reset & HTTP/2 Rapid Reset Flood',
                 vector: 'PHISHING',
-                patternWeight: 0.84,
+                patternWeight: 0.85,
                 projectedLossM: 22.8,
-                windowHours: 'Next 4–16h',
-                rationale: '60-day incident logs highlight coordinated telecom social engineering paired with edge HTTP floods to distract SOC/IAM operators.'
+                windowHours: 'Next 4–16h (Peak ~14:00 UTC)',
+                rationale: '60-day incident logs highlight coordinated telecom social engineering paired with edge HTTP floods to distract SOC/IAM operators.',
+                parameters: [
+                    'Carbon Weight (0.58): Vishing/helpdesk MFA reset -> wire diversion sequence observed in 60d US bank alerts',
+                    'Hydrogen Weight (0.42): Surge in PHISHING & DDOS vectors hitting AMS->IAD corridor',
+                    'Firmware Drift Signal: PAN-OS 10.2.8-h3 & Ledger Vault FW v1.0.4 lag latest security baseline'
+                ]
             },
             {
                 id: 'PAT-60D-04',
@@ -1348,12 +1418,20 @@
                 actorOrigin: 'US West Coast Cloud Proxies [SJC]',
                 system: 'Prime Margin Clearing & Cold-to-Hot Sweeper',
                 targetMachine: 'lhr-sweep-worker-07.uk-prime.core.internal (RHEL 9 / Vault Agent)',
+                outdatedFirmware: 'Entrust nShield Connect FW v12.70.1 (Outdated) & Juniper Junos 21.4R3',
+                financialBodies: 'UK NCA/UKFIU, FCA, Bank of England, LCH',
+                demandFocus: 'Extortion Ransom + Gilts/Margin Securities + CHAPS Transfers',
                 vulnerability: 'Snowflake/IAM Session Replay & Sweeper Whitelist Drift',
                 vector: 'PHISHING',
-                patternWeight: 0.79,
+                patternWeight: 0.81,
                 projectedLossM: 31.4,
-                windowHours: 'Next 6–18h',
-                rationale: '60-day media coverage documents recurring extortion waves hitting UK/EU prime brokers via identity-provider session takeover.'
+                windowHours: 'Next 6–18h (Peak ~16:45 UTC)',
+                rationale: '60-day media coverage documents recurring extortion waves hitting UK/EU prime brokers via identity-provider session takeover.',
+                parameters: [
+                    'Carbon Weight (0.61): Prime-broker session replay & sweeper whitelist anomaly correlation',
+                    'Hydrogen Weight (0.39): Elevated SJC->LHR telemetry velocity & UK market-hours activity',
+                    'Firmware Drift Signal: Entrust nShield FW v12.70.1 & Junos 21.4R3 require patch alignment'
+                ]
             },
             {
                 id: 'PAT-60D-05',
@@ -1363,12 +1441,20 @@
                 actorOrigin: 'Hong Kong C2 Staging Node [HKG]',
                 system: 'Corporate Escrow & ERP Reconciliation Engine',
                 targetMachine: 'tyo-erp-reconcile-03.jp-trust.internal (Debian 12 / Node Runtime)',
+                outdatedFirmware: 'Utimaco CryptoServer FW v4.30.1 (Outdated) & ESXi 7.0 U3o',
+                financialBodies: 'JAFIC, FSA Japan, Bank of Japan, JSCC',
+                demandFocus: 'XMR Ransom + Tokenized JGB Securities + Zengin/SWIFT',
                 vulnerability: 'Trojanized Dependency & Unsigned Reconciliation Webhook',
                 vector: 'MALWARE',
-                patternWeight: 0.82,
+                patternWeight: 0.83,
                 projectedLossM: 51.2,
-                windowHours: 'Next 8–20h',
-                rationale: '60-day threat reports show supply-chain package poisoning and double-extortion staging targeting East Asian trust & escrow platforms.'
+                windowHours: 'Next 8–20h (Peak ~01:30 UTC)',
+                rationale: '60-day threat reports show supply-chain package poisoning and double-extortion staging targeting East Asian trust & escrow platforms.',
+                parameters: [
+                    'Carbon Weight (0.59): Supply-chain / escrow reconciliation tampering signature across 60d briefs',
+                    'Hydrogen Weight (0.41): HKG->TYO staging traffic & malware payload velocity in 24h stream',
+                    'Firmware Drift Signal: Utimaco CryptoServer FW v4.30.1 & ESXi 7.0 U3o unpatched hypervisor risk'
+                ]
             },
             {
                 id: 'PAT-60D-06',
@@ -1378,22 +1464,30 @@
                 actorOrigin: 'Middle East / Eastern Proxy Cluster [DXB]',
                 system: 'SWIFT Alliance Interface & Trade Finance Vault',
                 targetMachine: 'hkg-swift-gw-01.hk-trade.fin.internal (Windows Server / Alliance Gateway)',
+                outdatedFirmware: 'IBM 4769 PCIe Crypto FW v2.42 (Outdated) & Fortinet SSL-VPN 7.0.12',
+                financialBodies: 'HKMA, JFIU Hong Kong, SFC, HKEX Clearing',
+                demandFocus: 'BTC Ransom + Trade Finance Securities + CHATS/SWIFT Wires',
                 vulnerability: 'Malicious Invoice Macro & Domain Privilege Escalation',
                 vector: 'INTRUSION',
-                patternWeight: 0.77,
+                patternWeight: 0.78,
                 projectedLossM: 27.9,
-                windowHours: 'Next 12–24h',
-                rationale: '60-day reporting links trade-finance spear-phishing lures to lateral movement toward SWIFT messaging and cross-border escrow nodes.'
+                windowHours: 'Next 12–24h (Peak ~11:10 UTC)',
+                rationale: '60-day reporting links trade-finance spear-phishing lures to lateral movement toward SWIFT messaging and cross-border escrow nodes.',
+                parameters: [
+                    'Carbon Weight (0.57): Trade-document spear-lure -> SWIFT gateway escalation chain',
+                    'Hydrogen Weight (0.43): DXB->HKG relay cadence & intrusion detection frequency',
+                    'Firmware Drift Signal: IBM 4769 Crypto FW v2.42 & SSL-VPN 7.0.12 exposure indicators'
+                ]
             }
         ];
 
         const gemini4State = {
-            modelId: GEMINI4_MODELS.primary,
-            thinkingLevel: 'HIGH',
-            modeLabel: '60D PATTERN ENGINE (GEMINI 4 NEON READY)',
+            modelId: `${GEMINI4_MODELS.carbon} + ${GEMINI4_MODELS.hydrogen}`,
+            modeLabel: 'CARBON + HYDROGEN COMBINED (60D + 24H)',
             lastRunIso: null,
             liveGrounded: false,
-            predictions: []
+            predictions: [],
+            selectedPrediction: null
         };
 
         function computeSixtyDaySequenceScore(pat, node) {
@@ -1401,16 +1495,18 @@
             const nodeHits = recentAttacks.filter(a => a.dst.id === node.id || a.src.id === node.id).length;
             const vectorHits = recentAttacks.filter(a => a.type === pat.vector).length;
             const incidentHits = state.liveIncidents.filter(inc => inc.targetNodeId === node.id || inc.originNodeId === node.id).length;
-            const threatBoost = { CRITICAL: 0.08, HIGH: 0.05, ELEVATED: 0.02, MODERATE: 0.0, LOW: -0.02 }[node.threat] ?? 0;
+            const threatBoost = { CRITICAL: 0.07, HIGH: 0.045, ELEVATED: 0.02, MODERATE: 0.0, LOW: -0.02 }[node.threat] ?? 0;
 
-            const raw =
-                pat.patternWeight * 0.72 +
-                Math.min(0.14, nodeHits * 0.025) +
-                Math.min(0.08, vectorHits * 0.012) +
-                Math.min(0.10, incidentHits * 0.05) +
-                threatBoost;
+            const hydrogenSignal = Math.min(0.16, nodeHits * 0.028 + vectorHits * 0.012);
+            const carbonSignal = pat.patternWeight * 0.74 + Math.min(0.09, incidentHits * 0.045) + threatBoost;
+            const raw = carbonSignal * 0.62 + (pat.patternWeight * 0.74 + hydrogenSignal) * 0.38;
 
-            return Math.min(0.99, Math.max(0.18, raw));
+            return {
+                score: Math.min(0.99, Math.max(0.22, raw)),
+                nodeHits,
+                vectorHits,
+                incidentHits
+            };
         }
 
         function synthesizeSixtyDayPredictions(llmOverrides = null) {
@@ -1426,16 +1522,16 @@
             const results = SIXTY_DAY_MEDIA_PATTERNS.map((pat, idx) => {
                 const node = CYBER_NODES.find(n => n.id === pat.nodeId) || CYBER_NODES[idx % CYBER_NODES.length];
                 const originNode = CYBER_NODES.find(n => pat.actorOrigin.includes(`[${n.id}]`)) || null;
-                const baseProb = computeSixtyDaySequenceScore(pat, node);
+                const evalRes = computeSixtyDaySequenceScore(pat, node);
                 const ov = overrideMap.get(node.id);
 
                 const probability = ov && typeof ov.probabilityPercent === 'number'
                     ? Math.min(99, Math.max(15, Math.round(ov.probabilityPercent)))
-                    : Math.round(baseProb * 100);
+                    : Math.round(evalRes.score * 100);
 
                 const projectedLossM = ov && typeof ov.estimatedLossMillions === 'number'
                     ? Number(ov.estimatedLossMillions.toFixed(1))
-                    : Number(((probability / 100) * pat.projectedLossM * 1.15).toFixed(1));
+                    : Number(((probability / 100) * pat.projectedLossM * 1.12).toFixed(1));
 
                 return {
                     id: pat.id,
@@ -1446,13 +1542,20 @@
                     actorOrigin: ov?.actorOrigin || pat.actorOrigin,
                     system: ov?.targetSystem || pat.system,
                     targetMachine: ov?.targetMachine || pat.targetMachine,
+                    outdatedFirmware: ov?.outdatedFirmware || pat.outdatedFirmware,
+                    financialBodies: ov?.financialBodies || pat.financialBodies,
+                    demandFocus: ov?.demandFocus || pat.demandFocus,
                     vulnerability: ov?.vulnerability || pat.vulnerability,
                     vector: ATTACK_TYPES[ov?.vector] ? ov.vector : pat.vector,
                     mediaSource: pat.mediaSource,
                     windowHours: ov?.windowHours || pat.windowHours,
                     probability,
                     projectedLossM,
-                    rationale: ov?.rationale || pat.rationale
+                    rationale: ov?.rationale || pat.rationale,
+                    parameters: ov?.decidingParameters || [
+                        ...pat.parameters,
+                        `Live 24h Telemetry: ${evalRes.nodeHits} hub hits, ${evalRes.vectorHits} ${pat.vector} vectors, ${evalRes.incidentHits} recent breaches`
+                    ]
                 };
             });
 
@@ -1463,10 +1566,10 @@
             return results;
         }
 
-        async function callGemini4WithBackoff(modelName, payload, maxRetries = 2) {
+        async function callGemini4WithBackoff(modelName, payload, maxRetries = 1) {
             const apiKey = '';
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-            let delayMs = 800;
+            let delayMs = 600;
 
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 try {
@@ -1494,42 +1597,51 @@
             return null;
         }
 
-        async function runGemini4SixtyDayPrediction(useDeepCarbon = false) {
-            const selectedModel = useDeepCarbon ? GEMINI4_MODELS.deep : GEMINI4_MODELS.primary;
-            gemini4State.modelId = selectedModel;
-            gemini4State.thinkingLevel = useDeepCarbon ? 'HIGH' : 'HIGH';
-
-            // Immediately compute baseline 60-day sequence scores so the UI is instant & responsive
+        async function runGemini4SixtyDayPrediction(mode = 'COMBINED') {
             synthesizeSixtyDayPredictions();
-            gemini4State.modeLabel = `QUERYING ${selectedModel.toUpperCase()} (60D MEDIA)...`;
+            gemini4State.modeLabel = `RUNNING CARBON + HYDROGEN (${mode})...`;
             renderForecastFeed();
 
             const recentSequenceSummary = state.attacks.slice(-12).map(a => `${a.src.id}->${a.dst.id}(${a.type})`).join(', ');
             const incidentSummary = state.liveIncidents.slice(0, 4).map(i => `${i.institution} [${i.targetNodeId}] from [${i.originNodeId}] loss ${i.loss}`).join(' | ');
 
             const prompt = [
-                'Analyze the last 60 days of global cyber-financial and ransomware media/advisory patterns along with live radar telemetry:',
-                `Recent attack sequence: ${recentSequenceSummary || 'None'}.`,
+                'Combine Carbon (deep 60-day media & financial-crime reasoning) and Hydrogen (fast live 24h sequence scoring):',
+                `Live 24h attack sequence: ${recentSequenceSummary || 'None'}.`,
                 `Recent financial incidents: ${incidentSummary || 'None'}.`,
-                'Predict the top 4 most probable next cyber-financial attacks over the next 24 hours across these hub IDs: FRA, SIN, IAD, LHR, TYO, HKG.',
-                'For each prediction return JSON array with fields: nodeId, location, targetSystem, targetMachine, vulnerability, threatActor, actorOrigin, vector (DDOS|MALWARE|INTRUSION|PHISHING), probabilityPercent (15-99), estimatedLossMillions (number), windowHours, rationale.'
+                'Predict WHO attacks, WHAT system/machine/outdated firmware is targeted, WHEN it will happen in next 24h, which financial bodies are impacted, probabilityPercent (15-99), and key decidingParameters across FRA, SIN, IAD, LHR, TYO, HKG.',
+                'Return a JSON array with fields: nodeId, location, targetSystem, targetMachine, outdatedFirmware, financialBodies, demandFocus, vulnerability, threatActor, actorOrigin, vector, probabilityPercent, estimatedLossMillions, windowHours, rationale, decidingParameters (array of strings).'
             ].join(' ');
 
-            const payload = {
+            const carbonPayload = {
                 contents: [{ role: 'user', parts: [{ text: prompt }] }],
                 tools: [{ google_search: {} }],
                 systemInstruction: {
-                    parts: [{ text: 'You are a senior FIU/FCO cyber threat intelligence analyst using 60-day media & threat pattern synthesis. Respond concisely with valid JSON.' }]
+                    parts: [{ text: 'You are a combined Carbon + Hydrogen FIU/FCO predictive threat engine. Output valid JSON only.' }]
                 },
                 generationConfig: {
-                    thinkingConfig: { thinkingLevel: gemini4State.thinkingLevel }
+                    thinkingConfig: { thinkingLevel: 'HIGH' }
                 }
             };
 
-            let data = await callGemini4WithBackoff(selectedModel, payload, 1);
-            if (!data && selectedModel !== GEMINI4_MODELS.fallback) {
-                gemini4State.modelId = GEMINI4_MODELS.fallback;
-                data = await callGemini4WithBackoff(GEMINI4_MODELS.fallback, payload, 1);
+            const hydrogenPayload = {
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                systemInstruction: {
+                    parts: [{ text: 'Fast Hydrogen sequence scorer for FIU/FCO 24h predictions. Output valid JSON only.' }]
+                },
+                generationConfig: {
+                    thinkingConfig: { thinkingLevel: 'LOW' }
+                }
+            };
+
+            let data = null;
+            if (mode === 'HYDROGEN') {
+                data = await callGemini4WithBackoff(GEMINI4_MODELS.hydrogen, hydrogenPayload, 1);
+            } else {
+                data = await callGemini4WithBackoff(GEMINI4_MODELS.carbon, carbonPayload, 1);
+                if (!data) {
+                    data = await callGemini4WithBackoff(GEMINI4_MODELS.hydrogen, hydrogenPayload, 1);
+                }
             }
 
             const rawText = data?.candidates?.[0]?.content?.parts?.find(p => typeof p.text === 'string')?.text || '';
@@ -1539,20 +1651,121 @@
                     const parsed = JSON.parse(jsonMatch[0]);
                     if (Array.isArray(parsed) && parsed.length > 0) {
                         gemini4State.liveGrounded = true;
-                        gemini4State.modeLabel = `${gemini4State.modelId.toUpperCase()} · 60D SEARCH GROUNDED`;
+                        gemini4State.modeLabel = `CARBON + HYDROGEN · LIVE GROUNDED (${mode})`;
                         synthesizeSixtyDayPredictions(parsed);
-                        showToast(`Updated 60-Day Forecast via ${gemini4State.modelId}`);
+                        showToast(`Carbon + Hydrogen forecast updated (${mode})`);
                         return;
                     }
                 } catch (_) {
-                    // Fall back cleanly to deterministic 60-day synthesis
+                    // Fall back cleanly to deterministic Carbon + Hydrogen synthesis
                 }
             }
 
             gemini4State.liveGrounded = false;
-            gemini4State.modeLabel = `${gemini4State.modelId.toUpperCase()} · 60D PATTERN ENGINE`;
+            gemini4State.modeLabel = `CARBON + HYDROGEN COMBINED (${mode})`;
             synthesizeSixtyDayPredictions();
         }
+
+        const predictionModal = document.getElementById('prediction-modal');
+
+        function buildPredictionReportText(pred) {
+            return [
+                '================================================================================',
+                'CARBON + HYDROGEN COMBINED PREDICTIVE THREAT REPORT (24H / 60D PATTERN ENGINE)',
+                '================================================================================',
+                `GENERATED (UTC):     ${new Date().toISOString()}`,
+                `PREDICTION ID:       ${pred.id}`,
+                `PROBABILITY CHANCE:  ${pred.probability}% (Est. Exposure: ~$${pred.projectedLossM}M USD)`,
+                `PREDICTED WINDOW:    ${pred.windowHours}`,
+                '',
+                '1. WHO, WHAT & WHEN SUMMARY',
+                `   - WHO (Actor):       ${pred.actor}`,
+                `   - ORIGIN / RELAY:    ${pred.actorOrigin}`,
+                `   - LOCATION:          ${pred.locationLabel}`,
+                `   - WHAT (System):     ${pred.system}`,
+                `   - TARGET MACHINE:    ${pred.targetMachine}`,
+                `   - VULNERABILITY:     ${pred.vulnerability}`,
+                `   - OUTDATED FIRMWARE: ${pred.outdatedFirmware}`,
+                `   - FINANCIAL BODIES:  ${pred.financialBodies}`,
+                `   - DEMAND / TRANSFER: ${pred.demandFocus}`,
+                `   - VECTOR TYPE:       ${pred.vector}`,
+                '',
+                '2. WHY THIS WILL HAPPEN (CARBON + HYDROGEN RATIONALE)',
+                `   - Rationale:         ${pred.rationale}`,
+                `   - 60d Media Basis:   ${pred.mediaSource}`,
+                '',
+                '3. DECIDING PARAMETERS THAT DETERMINED THIS PREDICTION',
+                ...(pred.parameters || []).map((p, i) => `   [${i + 1}] ${p}`),
+                '================================================================================'
+            ].join('\n');
+        }
+
+        function downloadPredictionReport(pred) {
+            if (!pred) return;
+            const text = buildPredictionReportText(pred);
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${pred.id}_${pred.node.id}_CarbonHydrogen_Report.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded ${pred.id} Predictive Report (.TXT)`);
+        }
+
+        function openPredictionModal(pred) {
+            if (!pred) return;
+            gemini4State.selectedPrediction = pred;
+            document.getElementById('pred-modal-prob').textContent = `${pred.probability}% PROBABILITY`;
+            document.getElementById('pred-modal-title').textContent = `${pred.locationLabel} · ${pred.actor}`;
+            document.getElementById('pred-modal-who').textContent = pred.actor;
+            document.getElementById('pred-modal-origin').textContent = `From: ${pred.actorOrigin}`;
+            document.getElementById('pred-modal-what').textContent = pred.system;
+            document.getElementById('pred-modal-machine').textContent = pred.targetMachine;
+            document.getElementById('pred-modal-when').textContent = pred.windowHours;
+            document.getElementById('pred-modal-loss').textContent = `~$${pred.projectedLossM}M · ${pred.demandFocus}`;
+            document.getElementById('pred-modal-rationale').textContent = pred.rationale;
+            document.getElementById('pred-modal-params').innerHTML = (pred.parameters || [])
+                .map(param => `<div>• ${param}</div>`)
+                .join('');
+            document.getElementById('pred-modal-infra').innerHTML = `
+                <div>• <strong>Vulnerable System &amp; Flaw:</strong> ${pred.system} — ${pred.vulnerability}</div>
+                <div>• <strong>Outdated Firmware:</strong> <span class="text-red-700 font-semibold">${pred.outdatedFirmware}</span></div>
+                <div>• <strong>Financial &amp; Regulatory Bodies:</strong> <span class="text-orange-800 font-semibold">${pred.financialBodies}</span></div>
+            `;
+
+            predictionModal.classList.remove('hidden');
+            predictionModal.classList.add('flex');
+        }
+
+        function closePredictionModal() {
+            predictionModal.classList.add('hidden');
+            predictionModal.classList.remove('flex');
+        }
+
+        document.getElementById('btn-close-pred-modal').addEventListener('click', closePredictionModal);
+        predictionModal.addEventListener('click', e => {
+            if (e.target === predictionModal) closePredictionModal();
+        });
+        document.getElementById('btn-pred-lock-globe').addEventListener('click', () => {
+            const pred = gemini4State.selectedPrediction;
+            if (pred) {
+                const meta = ATTACK_TYPES[pred.vector] || ATTACK_TYPES.INTRUSION;
+                focusOnNode(pred.node, `PRED ${pred.probability}%: ${pred.node.id}`);
+                spawnImpactRipple(pred.node.position, meta.color);
+                if (pred.originNode) spawnAttack(pred.vector, pred.node, pred.originNode);
+            }
+            closePredictionModal();
+        });
+        document.getElementById('btn-download-pred-report').addEventListener('click', () => {
+            if (gemini4State.selectedPrediction) {
+                downloadPredictionReport(gemini4State.selectedPrediction);
+            }
+        });
+
+        const forecastFeedContainer = document.getElementById('forecast-feed');
 
         function renderForecastFeed() {
             if (!forecastFeedContainer) return;
@@ -1567,19 +1780,19 @@
             headerBanner.innerHTML = `
                 <span class="truncate">${gemini4State.modeLabel}</span>
                 <div class="flex items-center gap-1 shrink-0">
-                    <button id="btn-run-neon" class="apple-btn px-2 py-0.5 !bg-white/95 hover:!bg-white !border-amber-500/40 text-amber-950 font-bold">NEON</button>
-                    <button id="btn-run-carbon" class="apple-btn px-2 py-0.5 !bg-slate-900 hover:!bg-slate-800 !border-slate-900 text-white font-bold">CARBON</button>
+                    <button id="btn-run-combined" class="apple-btn px-2 py-0.5 !bg-slate-900 hover:!bg-slate-800 !border-slate-900 text-white font-bold">C+H RUN</button>
+                    <button id="btn-run-hydrogen" class="apple-btn px-2 py-0.5 !bg-white/95 hover:!bg-white !border-amber-500/40 text-amber-950 font-bold">H2 FAST</button>
                 </div>
             `;
             forecastFeedContainer.appendChild(headerBanner);
 
-            headerBanner.querySelector('#btn-run-neon').addEventListener('click', e => {
+            headerBanner.querySelector('#btn-run-combined').addEventListener('click', e => {
                 e.stopPropagation();
-                runGemini4SixtyDayPrediction(false);
+                runGemini4SixtyDayPrediction('COMBINED');
             });
-            headerBanner.querySelector('#btn-run-carbon').addEventListener('click', e => {
+            headerBanner.querySelector('#btn-run-hydrogen').addEventListener('click', e => {
                 e.stopPropagation();
-                runGemini4SixtyDayPrediction(true);
+                runGemini4SixtyDayPrediction('HYDROGEN');
             });
 
             gemini4State.predictions.forEach(pred => {
@@ -1592,45 +1805,83 @@
                         <span class="font-bold text-slate-900 truncate">${pred.locationLabel} · ${pred.windowHours}</span>
                         <span class="font-bold ${probColor} shrink-0">${pred.probability}% · ~$${pred.projectedLossM}M</span>
                     </div>
-                    <div class="text-[10px] text-orange-800 font-semibold truncate mt-0.5">System: ${pred.system}</div>
-                    <div class="text-[10px] text-slate-700 truncate mt-0.5">Machine: ${pred.targetMachine}</div>
-                    <div class="text-[10px] text-slate-600 truncate mt-0.5">By / Origin: <span class="font-semibold text-slate-800">${pred.actor}</span> (${pred.actorOrigin})</div>
+                    <div class="text-[10px] text-orange-800 font-semibold truncate mt-0.5">WHO: ${pred.actor} (${pred.actorOrigin})</div>
+                    <div class="text-[10px] text-slate-800 truncate mt-0.5">WHAT: ${pred.system} · <span class="text-slate-600">${pred.targetMachine.split(' ')[0]}</span></div>
+                    <div class="text-[10px] text-red-700 truncate mt-0.5">FW/Bodies: ${pred.outdatedFirmware.split('(')[0].trim()} · ${pred.financialBodies.split(',')[0]}</div>
                     <div class="flex items-center justify-between gap-2 mt-1.5 pt-1 border-t border-slate-200/80 text-[10px]">
-                        <span class="text-slate-500 truncate">${pred.mediaSource}</span>
+                        <span class="text-amber-900 font-semibold truncate">Click for Report &amp; Parameters (.TXT)</span>
                         <span class="px-1.5 py-0.5 rounded-full border text-[9px] font-bold shrink-0 ${meta.badgeClass}">${pred.vector}</span>
                     </div>
                 `;
                 card.addEventListener('click', () => {
-                    focusOnNode(pred.node, `60D RISK ${pred.probability}%: ${pred.node.id}`);
-                    spawnImpactRipple(pred.node.position, meta.color);
+                    const m = ATTACK_TYPES[pred.vector] || ATTACK_TYPES.INTRUSION;
+                    focusOnNode(pred.node, `PRED ${pred.probability}%: ${pred.node.id}`);
+                    spawnImpactRipple(pred.node.position, m.color);
                     if (pred.originNode) {
                         spawnAttack(pred.vector, pred.node, pred.originNode);
                     }
-                    showToast(`Locked ${pred.targetMachine} @ ${pred.node.name} (${pred.probability}% prob by ${pred.actor})`);
+                    openPredictionModal(pred);
                 });
                 forecastFeedContainer.appendChild(card);
             });
         }
 
-        function buildForecastReportSection(inc) {
+        function buildForecastReportSection() {
             if (!gemini4State.predictions || gemini4State.predictions.length === 0) {
                 synthesizeSixtyDayPredictions();
             }
             const topThree = gemini4State.predictions.slice(0, 3);
             const lines = [
                 '',
-                '6. 60-DAY MEDIA & THREAT SEQUENCE PREDICTIVE FORECAST (GOOGLE GEMINI 4)',
-                `   - Model Stack:       Primary ${GEMINI4_MODELS.primary} | Deep ${GEMINI4_MODELS.deep} | Fallback ${GEMINI4_MODELS.fallback}`,
-                `   - Engine Status:     ${gemini4State.modeLabel} (Thinking: ${gemini4State.thinkingLevel})`
+                '6. CARBON + HYDROGEN COMBINED PREDICTIVE FORECAST (60D MEDIA + 24H TELEMETRY)',
+                `   - Model Stack:       Carbon (${GEMINI4_MODELS.carbon}) + Hydrogen (${GEMINI4_MODELS.hydrogen})`,
+                `   - Engine Status:     ${gemini4State.modeLabel}`
             ];
             topThree.forEach((p, idx) => {
-                lines.push(`   - Forecast #${idx + 1}: ${p.probability}% Prob (~$${p.projectedLossM}M est. loss) | Window: ${p.windowHours}`);
-                lines.push(`     Location: ${p.locationLabel} | System: ${p.system}`);
-                lines.push(`     Machine:  ${p.targetMachine} | Vuln: ${p.vulnerability}`);
-                lines.push(`     Attacker/Origin: ${p.actor} from ${p.actorOrigin} | Basis: ${p.mediaSource}`);
+                lines.push(`   - Forecast #${idx + 1}: ${p.probability}% Prob (~$${p.projectedLossM}M est.) | WHEN: ${p.windowHours}`);
+                lines.push(`     WHERE/WHO: ${p.locationLabel} | Actor: ${p.actor} (${p.actorOrigin})`);
+                lines.push(`     WHAT/FW:   ${p.system} | Host: ${p.targetMachine} | FW: ${p.outdatedFirmware}`);
+                lines.push(`     BODIES:    ${p.financialBodies} | Parameters: ${(p.parameters || []).join(' ; ')}`);
             });
             return lines;
         }
+
+        // Right Panel Tab Switching
+        const tabPackets = document.getElementById('tab-packets');
+        const tabIncidents = document.getElementById('tab-incidents');
+        const tabForecast = document.getElementById('tab-forecast');
+
+        function setActiveRightTab(activeKey) {
+            tabIncidents.classList.remove('text-red-700', 'border-b-2', 'border-red-600');
+            tabIncidents.classList.add('text-slate-600');
+            tabForecast.classList.remove('text-amber-800', 'border-b-2', 'border-amber-600');
+            tabForecast.classList.add('text-slate-600');
+            tabPackets.classList.remove('text-orange-700', 'border-b-2', 'border-orange-600');
+            tabPackets.classList.add('text-slate-600');
+
+            incidentFeedContainer.classList.add('hidden');
+            forecastFeedContainer.classList.add('hidden');
+            feedContainer.classList.add('hidden');
+
+            if (activeKey === 'incidents') {
+                tabIncidents.classList.add('text-red-700', 'border-b-2', 'border-red-600');
+                tabIncidents.classList.remove('text-slate-600');
+                incidentFeedContainer.classList.remove('hidden');
+            } else if (activeKey === 'forecast') {
+                tabForecast.classList.add('text-amber-800', 'border-b-2', 'border-amber-600');
+                tabForecast.classList.remove('text-slate-600');
+                forecastFeedContainer.classList.remove('hidden');
+                synthesizeSixtyDayPredictions();
+            } else {
+                tabPackets.classList.add('text-orange-700', 'border-b-2', 'border-orange-600');
+                tabPackets.classList.remove('text-slate-600');
+                feedContainer.classList.remove('hidden');
+            }
+        }
+
+        tabIncidents.addEventListener('click', () => setActiveRightTab('incidents'));
+        tabForecast.addEventListener('click', () => setActiveRightTab('forecast'));
+        tabPackets.addEventListener('click', () => setActiveRightTab('packets'));
 
         // Populate Quick Sector Focus Buttons
         const quickFocusList = document.getElementById('quick-focus-list');
@@ -1828,13 +2079,16 @@
         });
 
         // ==========================================
-        // 9. MAIN ANIMATION & TELEMETRY LOOP
+        // 9. MAIN ANIMATION & 24H / MINUTE TELEMETRY LOOP
         // ==========================================
         let lastSpawnTime = 0;
 
         function updateClockAndStats() {
             const now = new Date();
-            document.getElementById('utc-clock').textContent = now.toISOString().substring(11, 19) + ' UTC';
+            const utcStr = now.toISOString().substring(11, 19) + ' UTC';
+            document.getElementById('utc-clock').textContent = utcStr;
+            const winEl = document.getElementById('stat-24h-window');
+            if (winEl) winEl.textContent = `24H LIVE · ${utcStr.slice(0, 5)}`;
             const baseApm = 1380 + state.attacks.length * 14 + Math.floor(Math.random() * 25);
             document.getElementById('stat-apm').textContent = baseApm.toLocaleString();
 
@@ -1849,12 +2103,19 @@
         }
         setInterval(updateClockAndStats, 1000);
 
-        function animate(time) {
+        // Minute-by-minute (every 60s) continuous 24h FIU/FCO & Carbon+Hydrogen refresh heartbeat
+        setInterval(() => {
+            pushNewFinancialIncident(1);
+            runGemini4SixtyDayPrediction('COMBINED');
+            showToast('24h Minute Sync: Updated financial bodies, firmware drift & Carbon+Hydrogen forecast');
+        }, 60000);
+
+        function animate(timestamp = 0) {
             requestAnimationFrame(animate);
 
-            if (time - lastSpawnTime > 850) {
+            if (timestamp - lastSpawnTime > 650) {
                 spawnAttack();
-                lastSpawnTime = time;
+                lastSpawnTime = timestamp;
             }
 
             if (state.autoRotate && !state.isDragging) {
@@ -1917,7 +2178,7 @@
         window.onload = async function () {
             await fetchLiveThreatFeeds();
 
-            // Seed initial FIU/FCO financial & crypto breaches from the last 2 minutes
+            // Seed initial FIU/FCO financial & crypto breaches
             pushNewFinancialIncident(108);
             pushNewFinancialIncident(74);
             pushNewFinancialIncident(41);
@@ -1933,4 +2194,4 @@
         };
     </script>
 </body>
-</html>
+    </html>
